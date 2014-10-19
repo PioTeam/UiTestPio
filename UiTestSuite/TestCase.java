@@ -21,11 +21,13 @@ import com.android.uiautomator.testrunner.*;
 public class TestCase extends UiAutomatorTestCase {
 
 	private static String TAG = "TestCase";
-	
+
 	private String propertiesPath = "/UiTest/properties.txt";
 	private String[] args = new String[2];
 	private String appName, tabApp = "";
 	private String contentDefaultFile = "appName = Settings\ntabApp = 2";
+	private Tree tree;
+	private Node actual;
 
 	/**
 	 * @generated All your test code will go here NOTE: Do not change the method
@@ -51,18 +53,23 @@ public class TestCase extends UiAutomatorTestCase {
 
 		UiSelector selector = new UiSelector().scrollable(true);
 		UiScrollable appViews = new UiScrollable(selector);
-		UiObject settingsApp = appViews.getChildByText(new UiSelector().className(android.widget.TextView.class.getName()), appName);
+		UiObject settingsApp = appViews.getChildByText(new UiSelector()
+				.className(android.widget.TextView.class.getName()), appName);
 		settingsApp.clickAndWaitForNewWindow();
 		
-		UiDevice device = getUiDevice();
+		Node actual = new Node(null, "", getUiDevice().getCurrentActivityName());
+		tree = new Tree(actual);
 
-		System.out.print("------------"+device.getCurrentActivityName());
-		// Validate that the package name is the expected one
-//		UiObject settingsValidation = new UiObject(
-//				new UiSelector().packageName("com.android.settings"));
+		UiDevice device = getUiDevice();
 		
-//		assertTrue("Unable to detect Settings", settingsValidation.exists());
-//		// CODE:END
+		System.out.println("------------" + device.getCurrentActivityName());
+		capturarElementosVistaActual();
+		// Validate that the package name is the expected one
+		// UiObject settingsValidation = new UiObject(
+		// new UiSelector().packageName("com.android.settings"));
+
+		// assertTrue("Unable to detect Settings", settingsValidation.exists());
+		// // CODE:END
 	}
 
 	public String readProperties() {
@@ -130,29 +137,49 @@ public class TestCase extends UiAutomatorTestCase {
 		}
 		return text.toString();
 	}
-	
-	
-		public void capturarElementosVistaActual() {
 
-		      //inicio obtener lista
-	      UiObject listview_elements = new UiObject(new UiSelector().className("android.widget.ListView"));
+	public void capturarElementosVistaActual() throws UiObjectNotFoundException {
 
-	      int numeroItemsVisuales = listview_elements.getChildCount();
-	      for(int i=0; i< numeroItemsVisuales; i++){
-		      UiSelector selector1 = new UiSelector().index(i);
-		      UiObject obj = listview_elements.getChild(selector1);
-		      System.out.println("-------------------Texto lista elemento "+i+":  "+obj.toString());
-		      System.out.println("----------------------------objeto "+i+":  "+obj.getClassName());
-		      System.out.println("----------------------------childCount "+i+":  "+obj.getChildCount());
-		      System.out.println("----------------------------descrip "+i+":  "+obj.getContentDescription());
-		      System.out.println("----------------------------texto "+i+":  "+obj.getText());
-		      System.out.println("----------------------------checkable "+i+":  "+obj.isCheckable());
-		      System.out.println("----------------------------clickable "+i+":  "+obj.isClickable());
-		      System.out.println("----------------------------focusable "+i+":  "+obj.isFocusable());
-		      System.out.println("----------------------------scrollable "+i+":  "+obj.isScrollable());
-		      System.out.println("----------------------------bounds "+i+":  "+obj.getBounds());
-	      }
+		// inicio obtener lista
+		UiObject listview_elements = new UiObject(
+				new UiSelector().className("android.widget.ListView"));
 
-	      //fin obtener lista
+		int numeroItemsVisuales = listview_elements.getChildCount();
+		System.out.println("-----------N° elementos lista " + numeroItemsVisuales);
+		Node aux;
+		for (int i = 0; i < numeroItemsVisuales; i++) {
+			UiSelector selector1 = new UiSelector().index(i);
+			UiObject obj = listview_elements.getChild(selector1);
+			aux = agregarNodo(actual, i+"", getUiDevice().getCurrentActivityName());
+			System.out.println("-------------------Texto lista elemento " + i
+					+ ":  " + obj.toString());
+//			System.out.println("----------------------------objeto " + i
+//					+ ":  " + obj.getClassName());
+			System.out.println("----------------------------childCount " + i
+					+ ":  " + obj.getChildCount());
+			System.out.println("----------------------------descrip " + i
+					+ ":  " + obj.getContentDescription());
+			System.out.println("----------------------------texto " + i + ":  "
+					+ obj.getText());
+			System.out.println("----------------------------checkable " + i
+					+ ":  " + obj.isCheckable());
+			System.out.println("----------------------------clickable " + i
+					+ ":  " + obj.isClickable());
+			System.out.println("----------------------------focusable " + i
+					+ ":  " + obj.isFocusable());
+			System.out.println("----------------------------scrollable " + i
+					+ ":  " + obj.isScrollable());
+			System.out.println("----------------------------bounds " + i
+					+ ":  " + obj.getBounds());
+		}
+
+		// fin obtener lista
 	}
+	
+	public Node agregarNodo(Node dad, String index, String activity){
+		Node node = new Node(dad, index, activity);
+		actual.add(node);
+		return node;
+	}
+	
 }
