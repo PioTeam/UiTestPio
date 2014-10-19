@@ -21,6 +21,7 @@ import com.android.uiautomator.testrunner.*;
 public class TestCase extends UiAutomatorTestCase {
 
 	private static String TAG = "TestCase";
+	
 	private String propertiesPath = "/UiTest/properties.txt";
 	private String[] args = new String[2];
 	private String appName, tabApp = "";
