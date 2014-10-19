@@ -130,4 +130,29 @@ public class TestCase extends UiAutomatorTestCase {
 		}
 		return text.toString();
 	}
+	
+	
+		public void capturarElementosVistaActual() {
+
+		      //inicio obtener lista
+	      UiObject listview_elements = new UiObject(new UiSelector().className("android.widget.ListView"));
+
+	      int numeroItemsVisuales = listview_elements.getChildCount();
+	      for(int i=0; i< numeroItemsVisuales; i++){
+		      UiSelector selector1 = new UiSelector().index(i);
+		      UiObject obj = listview_elements.getChild(selector1);
+		      System.out.println("-------------------Texto lista elemento "+i+":  "+obj.toString());
+		      System.out.println("----------------------------objeto "+i+":  "+obj.getClassName());
+		      System.out.println("----------------------------childCount "+i+":  "+obj.getChildCount());
+		      System.out.println("----------------------------descrip "+i+":  "+obj.getContentDescription());
+		      System.out.println("----------------------------texto "+i+":  "+obj.getText());
+		      System.out.println("----------------------------checkable "+i+":  "+obj.isCheckable());
+		      System.out.println("----------------------------clickable "+i+":  "+obj.isClickable());
+		      System.out.println("----------------------------focusable "+i+":  "+obj.isFocusable());
+		      System.out.println("----------------------------scrollable "+i+":  "+obj.isScrollable());
+		      System.out.println("----------------------------bounds "+i+":  "+obj.getBounds());
+	      }
+
+	      //fin obtener lista
+	}
 }
