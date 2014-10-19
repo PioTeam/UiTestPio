@@ -25,7 +25,7 @@ public class TestCase extends UiAutomatorTestCase {
 	private String propertiesPath = "/UiTest/properties.txt";
 	private String[] args = new String[2];
 	private String appName, tabApp = "";
-	private String contentDefaultFile = "appName = SexyResults\ntabApp = 2";
+	private String contentDefaultFile = "appName = Settings\ntabApp = 2";
 
 	/**
 	 * @generated All your test code will go here NOTE: Do not change the method
