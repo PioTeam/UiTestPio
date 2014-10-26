@@ -41,7 +41,7 @@ public class TestCase extends UiAutomatorTestCase {
 		actual = new Node(null, "", getUiDevice().getCurrentActivityName(), app);
 		tree = new Tree(actual);
 		getActualViewElements();
-		
+		evaluateState();
 		// Validate that the package name is the expected one
 		// UiObject settingsValidation = new UiObject(
 		// new UiSelector().packageName("com.android.settings"));
@@ -113,6 +113,7 @@ public class TestCase extends UiAutomatorTestCase {
 		} catch (IOException e) {
 
 		}
+		System.out.println("------------ File of properties ready!");
 		return text.toString();
 	}
 	
@@ -134,7 +135,7 @@ public class TestCase extends UiAutomatorTestCase {
 		UiObject app = appViews.getChildByText(new UiSelector()
 				.className(android.widget.TextView.class.getName()), appName);
 		app.clickAndWaitForNewWindow();
-		System.out.println("------------ App abierta "+ getUiDevice().getCurrentActivityName());
+		System.out.println("------------ App open "+ getUiDevice().getCurrentActivityName());
 		
 		return app;
 	}
@@ -154,8 +155,6 @@ public class TestCase extends UiAutomatorTestCase {
 			aux = addNode(actual, i+"", getUiDevice().getCurrentActivityName(), obj);
 			System.out.println("-------------------Texto lista elemento " + i
 					+ ":  " + obj.toString());
-//			System.out.println("----------------------------objeto " + i
-//					+ ":  " + obj.getClassName());
 			System.out.println("----------------------------childCount " + i
 					+ ":  " + obj.getChildCount());
 			System.out.println("----------------------------descrip " + i
@@ -173,8 +172,6 @@ public class TestCase extends UiAutomatorTestCase {
 			System.out.println("----------------------------bounds " + i
 					+ ":  " + obj.getBounds());
 		}
-
-		// fin obtener lista
 	}
 	
 	public String executeEvents() throws UiObjectNotFoundException{
@@ -188,6 +185,7 @@ public class TestCase extends UiAutomatorTestCase {
 			actual.getObject().longClick();
 			actual.setLongClickable(true);
 		}
+		System.out.println("------------ execute event call! "+ getUiDevice().getCurrentActivityName());
 		return getUiDevice().getCurrentActivityName();
 	}
 	
@@ -203,23 +201,50 @@ public class TestCase extends UiAutomatorTestCase {
 		}else if(actual.getState().equals(NodeState.ERROR)){
 			actual = actual.getDad();
 		}else if(actual.getState().equals(NodeState.NONE)){
-			getActualViewElements();
-			actual.setState(NodeState.VISITED);
-			if(actual.getChilds() != null){
-				actual = actual.getChilds().get(0);
-				
+			if(actual.isAnyEventAvaiable()){
+				String activity = executeEvents();
+				if(activity.equals(actual.getActivity())){
+					actual.setState(NodeState.VISITED);
+				}else{
+					getActualViewElements();
+					actual.setState(NodeState.VISITED);
+					if(actual.getChilds() != null){
+						actual = actual.getChilds().get(0);						
+					}else{
+						getUiDevice().pressBack();
+					}
+				}
 			}else{
 				actual.setState(NodeState.PASS);
-			}
-		}else if(actual.getState().equals(NodeState.VISITED)){
-			for(Node n: actual.getChilds()){
-				if(n.getState().equals(NodeState.NONE) || n.getState().equals(NodeState.VISITED)){
-					actual=n;
-					evaluateState();
-					return;
+				if(!actual.getDad().getActivity().equals(actual.getActivity())){
+					getUiDevice().pressBack();
 				}
 			}
-			actual.setState(NodeState.PASS);
+			
+		}else if(actual.getState().equals(NodeState.VISITED)){
+			if(actual.isAnyEventAvaiable()){
+				String activity = executeEvents();
+				if(!activity.equals(actual.getActivity())){
+					getActualViewElements();
+					if(actual.getChilds() != null){
+						actual = actual.getChilds().get(0);						
+					}else{
+						getUiDevice().pressBack();
+					}
+				}
+			}else{
+				for(Node n: actual.getChilds()){
+					if(n.getState().equals(NodeState.NONE) || n.getState().equals(NodeState.VISITED)){
+						actual=n;
+						evaluateState();
+						return;
+					}
+				}
+				actual.setState(NodeState.PASS);
+				if(!actual.getDad().getActivity().equals(actual.getActivity())){
+					getUiDevice().pressBack();
+				}
+			}
 		}
 		evaluateState();
 	}
@@ -331,7 +356,7 @@ class Node {
 	public void setCheckable(boolean checkable){
 		this.checkable = checkable;
 	}
-	public boolean isAnyEventAble(){
+	public boolean isAnyEventAvaiable(){
 		return clickable || scrollable || checkable || longClickable;
 	}
 }
