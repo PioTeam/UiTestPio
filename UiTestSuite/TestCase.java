@@ -37,10 +37,11 @@ public class TestCase extends UiAutomatorTestCase {
 		readProperties();
 		appName = args[0];
 		tabApp = args[1]; 
-		UiObject app = abrirApp();		
+		UiObject app = openApp();		
 		actual = new Node(null, "", getUiDevice().getCurrentActivityName(), app);
 		tree = new Tree(actual);
-		capturarElementosVistaActual();
+		getElementsActualView();
+		
 		// Validate that the package name is the expected one
 		// UiObject settingsValidation = new UiObject(
 		// new UiSelector().packageName("com.android.settings"));
@@ -115,7 +116,7 @@ public class TestCase extends UiAutomatorTestCase {
 		return text.toString();
 	}
 	
-	public UiObject abrirApp() throws UiObjectNotFoundException{
+	public UiObject openApp() throws UiObjectNotFoundException{
 		// takeScreenShot();
 		getUiDevice().pressHome();
 
@@ -133,12 +134,12 @@ public class TestCase extends UiAutomatorTestCase {
 		UiObject app = appViews.getChildByText(new UiSelector()
 				.className(android.widget.TextView.class.getName()), appName);
 		app.clickAndWaitForNewWindow();
-		System.out.println("------------ Hola :D "+ getUiDevice().getCurrentActivityName());
+		System.out.println("------------ App abierta "+ getUiDevice().getCurrentActivityName());
 		
 		return app;
 	}
 
-	public void capturarElementosVistaActual() throws UiObjectNotFoundException {
+	public void getElementsActualView() throws UiObjectNotFoundException {
 
 		// inicio obtener lista
 		UiObject listview_elements = new UiObject(
@@ -150,7 +151,7 @@ public class TestCase extends UiAutomatorTestCase {
 		for (int i = 0; i < numeroItemsVisuales; i++) {
 			UiSelector selector1 = new UiSelector().index(i);
 			UiObject obj = listview_elements.getChild(selector1);
-			aux = agregarNodo(actual, i+"", getUiDevice().getCurrentActivityName(), obj);
+			aux = addNode(actual, i+"", getUiDevice().getCurrentActivityName(), obj);
 			System.out.println("-------------------Texto lista elemento " + i
 					+ ":  " + obj.toString());
 //			System.out.println("----------------------------objeto " + i
@@ -176,7 +177,21 @@ public class TestCase extends UiAutomatorTestCase {
 		// fin obtener lista
 	}
 	
-	public Node agregarNodo(Node dad, String index, String activity, UiObject object){
+	public String executeEvents() throws UiObjectNotFoundException{
+		if(!actual.isCheckable() && actual.getObject().isCheckable()){
+			actual.getObject().click();
+			actual.setCheckable(true);
+		}else if(!actual.isClickable() && actual.getObject().isClickable()){
+			actual.getObject().click();
+			actual.setClickable(true);
+		}else if(!actual.isLongClickable() && actual.getObject().isLongClickable()){
+			actual.getObject().longClick();
+			actual.setLongClickable(true);
+		}
+		return getUiDevice().getCurrentActivityName();
+	}
+	
+	public Node addNode(Node dad, String index, String activity, UiObject object){
 		Node node = new Node(dad, index, activity, object);
 		actual.add(node);
 		return node;
@@ -191,11 +206,9 @@ class Tree {
 		this.root = node;
 		node.setDad(null);
 	}
-
 	public Node getRoot() {
 		return root;
 	}
-
 	public void setRoot(Node root) {
 		this.root = root;
 	}
@@ -209,6 +222,10 @@ class Node {
 	private ArrayList<Node> childs;
 	private NodeState state;
 	private UiObject object;
+	private boolean clickable;
+	private boolean scrollable;
+	private boolean checkable;
+	private boolean longClickable;
 	
 	public Node(Node dad, String index, String activity, UiObject object){
 		this.dad = dad;
@@ -220,13 +237,15 @@ class Node {
 		this.activity = activity;
 		this.state = NodeState.NONE;
 		this.object = object;
-	}
-	
+		this.clickable = false;
+		this.scrollable = false;
+		this.checkable = false;
+		this.longClickable = false;
+	}	
 	public void add(Node node){
 		if(childs==null)childs = new ArrayList<Node>();
 		childs.add(node);
 	}
-	
 	public String getActivity() {
 		return activity;
 	}
@@ -251,21 +270,43 @@ class Node {
 	public void setChilds(ArrayList<Node> childs) {
 		this.childs = childs;
 	}
-
 	public NodeState getState() {
 		return state;
 	}
-
 	public void setState(NodeState state) {
 		this.state = state;
 	}
-	
 	public UiObject getObject(){
 		return object;
 	}
-	
 	public void setObject(UiObject object){
 		this.object = object;
+	}
+	public boolean isClickable(){
+		return clickable;
+	}public boolean isLongClickable(){
+		return longClickable;
+	}
+	public boolean isScrollable(){
+		return scrollable;
+	}
+	public boolean isCheckable(){
+		return checkable;
+	}
+	public void setClickable(boolean clickable){
+		this.clickable = clickable;
+	}
+	public void setLongClickable(boolean longClickable){
+		this.longClickable = longClickable;
+	}
+	public void setScrollable(boolean scrollable){
+		this.scrollable = scrollable;
+	}
+	public void setCheckable(boolean checkable){
+		this.checkable = checkable;
+	}
+	public boolean isAnyEventAble(){
+		return clickable || scrollable || checkable || longClickable;
 	}
 }
 
