@@ -7,21 +7,25 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import android.os.Environment;
 
+import java.util.ArrayList;
+
+import android.os.Build;
+import android.os.Environment;
+import android.util.Log;
 import com.android.uiautomator.core.*;
 import com.android.uiautomator.testrunner.*;
 
 /**
- * Sexy Result
- * 
- * NOTE:1.This class can contain only one test case. 2.Do not change the class
- * name.
- */
-public class TestCase extends UiAutomatorTestCase {
+  asd
 
-	private static String TAG = "TestCase";
+NOTE:1.This class can contain only one test case.
+	 2.Do not change the class name.
+*/
+public class TestCase extends UiAutomatorTestCase {   
 
+	private static String TAG = "asd";
+	
 	private String propertiesPath = "/UiTest/properties.txt";
 	private String[] args = new String[2];
 	private String appName, tabApp = "";
@@ -29,40 +33,13 @@ public class TestCase extends UiAutomatorTestCase {
 	private Tree tree;
 	private Node actual;
 
-	/**
-	 * @generated All your test code will go here NOTE: Do not change the method
-	 *            signature
-	 */
 	public void test() throws UiObjectNotFoundException {
 		readProperties();
 		appName = args[0];
-		tabApp = args[1];
-		System.out.println("arg 0: " + args[0] + " fin");
-		System.out.println("arg 1: " + args[1] + " fin");
-		// takeScreenShot();
-		getUiDevice().pressHome();
-
-		UiObject allAppsButton = new UiObject(
-				new UiSelector().description("Apps"));
-
-		allAppsButton.clickAndWaitForNewWindow();
-
-		UiObject appsTab = new UiObject(new UiSelector().text("Apps"));
-
-		appsTab.click();
-
-		UiSelector selector = new UiSelector().scrollable(true);
-		UiScrollable appViews = new UiScrollable(selector);
-		UiObject app = appViews.getChildByText(new UiSelector()
-				.className(android.widget.TextView.class.getName()), appName);
-		app.clickAndWaitForNewWindow();
-		
-		Node actual = new Node(null, "", getUiDevice().getCurrentActivityName(), app);
+		tabApp = args[1]; 
+		UiObject app = abrirApp();		
+		actual = new Node(null, "", getUiDevice().getCurrentActivityName(), app);
 		tree = new Tree(actual);
-
-		UiDevice device = getUiDevice();
-		
-		System.out.println("------------" + device.getCurrentActivityName());
 		capturarElementosVistaActual();
 		// Validate that the package name is the expected one
 		// UiObject settingsValidation = new UiObject(
@@ -137,6 +114,29 @@ public class TestCase extends UiAutomatorTestCase {
 		}
 		return text.toString();
 	}
+	
+	public UiObject abrirApp() throws UiObjectNotFoundException{
+		// takeScreenShot();
+		getUiDevice().pressHome();
+
+		UiObject allAppsButton = new UiObject(
+				new UiSelector().description("Apps"));
+
+		allAppsButton.clickAndWaitForNewWindow();
+
+		UiObject appsTab = new UiObject(new UiSelector().text("Apps"));
+
+		appsTab.click();
+
+		UiSelector selector = new UiSelector().scrollable(true);
+		UiScrollable appViews = new UiScrollable(selector);
+		UiObject app = appViews.getChildByText(new UiSelector()
+				.className(android.widget.TextView.class.getName()), appName);
+		app.clickAndWaitForNewWindow();
+		System.out.println("------------ Hola :D "+ getUiDevice().getCurrentActivityName());
+		
+		return app;
+	}
 
 	public void capturarElementosVistaActual() throws UiObjectNotFoundException {
 
@@ -181,5 +181,96 @@ public class TestCase extends UiAutomatorTestCase {
 		actual.add(node);
 		return node;
 	}
+    
+}
+ 
+class Tree {
+	private Node root;
+	
+	public Tree(Node node){
+		this.root = node;
+		node.setDad(null);
+	}
+
+	public Node getRoot() {
+		return root;
+	}
+
+	public void setRoot(Node root) {
+		this.root = root;
+	}
 	
 }
+
+class Node {
+	private String activity;
+	private String id;
+	private Node dad;
+	private ArrayList<Node> childs;
+	private NodeState state;
+	private UiObject object;
+	
+	public Node(Node dad, String index, String activity, UiObject object){
+		this.dad = dad;
+		if(dad==null){
+			this.id = "0";
+		}else{
+			this.id = dad.getId()+"."+index;
+		}
+		this.activity = activity;
+		this.state = NodeState.NONE;
+		this.object = object;
+	}
+	
+	public void add(Node node){
+		if(childs==null)childs = new ArrayList<Node>();
+		childs.add(node);
+	}
+	
+	public String getActivity() {
+		return activity;
+	}
+	public void setActivity(String activity) {
+		this.activity = activity;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public Node getDad() {
+		return dad;
+	}
+	public void setDad(Node dad) {
+		this.dad = dad;
+	}
+	public ArrayList<Node> getChilds() {
+		return childs;
+	}
+	public void setChilds(ArrayList<Node> childs) {
+		this.childs = childs;
+	}
+
+	public NodeState getState() {
+		return state;
+	}
+
+	public void setState(NodeState state) {
+		this.state = state;
+	}
+	
+	public UiObject getObject(){
+		return object;
+	}
+	
+	public void setObject(UiObject object){
+		this.object = object;
+	}
+}
+
+ enum NodeState {
+	ERROR,PASS,VISITED,NONE
+}
+
+ 
