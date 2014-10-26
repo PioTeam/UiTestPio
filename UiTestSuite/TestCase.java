@@ -40,7 +40,7 @@ public class TestCase extends UiAutomatorTestCase {
 		UiObject app = openApp();		
 		actual = new Node(null, "", getUiDevice().getCurrentActivityName(), app);
 		tree = new Tree(actual);
-		getElementsActualView();
+		getActualViewElements();
 		
 		// Validate that the package name is the expected one
 		// UiObject settingsValidation = new UiObject(
@@ -139,7 +139,7 @@ public class TestCase extends UiAutomatorTestCase {
 		return app;
 	}
 
-	public void getElementsActualView() throws UiObjectNotFoundException {
+	public void getActualViewElements() throws UiObjectNotFoundException {
 
 		// inicio obtener lista
 		UiObject listview_elements = new UiObject(
@@ -203,7 +203,7 @@ public class TestCase extends UiAutomatorTestCase {
 		}else if(actual.getState().equals(NodeState.ERROR)){
 			actual = actual.getDad();
 		}else if(actual.getState().equals(NodeState.NONE)){
-			capturarElementosVistaActual();
+			getActualViewElements();
 			actual.setState(NodeState.VISITED);
 			if(actual.getChilds() != null){
 				actual = actual.getChilds().get(0);
