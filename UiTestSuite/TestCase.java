@@ -197,32 +197,6 @@ public class TestCase extends UiAutomatorTestCase {
 		return node;
 	}
     
-	public void evaluateState() throws UiObjectNotFoundException{
-		if(actual.getState().equals(NodeState.PASS)){
-			actual = actual.getDad();
-		}else if(actual.getState().equals(NodeState.ERROR)){
-			actual = actual.getDad();
-		}else if(actual.getState().equals(NodeState.NONE)){
-			capturarElementosVistaActual();
-			actual.setState(NodeState.VISITED);
-			if(actual.getChilds() != null){
-				actual = actual.getChilds().get(0);
-				
-			}else{
-				actual.setState(NodeState.PASS);
-			}
-		}else if(actual.getState().equals(NodeState.VISITED)){
-			for(Node n: actual.getChilds()){
-				if(n.getState().equals(NodeState.NONE) || n.getState().equals(NodeState.VISITED)){
-					actual=n;
-					evaluateState();
-					return;
-				}
-			}
-			actual.setState(NodeState.PASS);
-		}
-		evaluateState();
-	}
 }
  
 class Tree {
