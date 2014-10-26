@@ -42,6 +42,7 @@ public class TestCase extends UiAutomatorTestCase {
 		tree = new Tree(actual);
 		getActualViewElements();
 		evaluateState();
+		System.out.println("------------- Tree :D "+tree);
 		// Validate that the package name is the expected one
 		// UiObject settingsValidation = new UiObject(
 		// new UiSelector().packageName("com.android.settings"));
@@ -194,6 +195,10 @@ public class TestCase extends UiAutomatorTestCase {
 		actual.add(node);
 		return node;
 	}
+	
+	public boolean isActualRoot(){
+		return actual.getDad()==null;
+	}
     
 	public void evaluateState() throws UiObjectNotFoundException{
 		if(actual.getState().equals(NodeState.PASS)){
@@ -201,7 +206,7 @@ public class TestCase extends UiAutomatorTestCase {
 		}else if(actual.getState().equals(NodeState.ERROR)){
 			actual = actual.getDad();
 		}else if(actual.getState().equals(NodeState.NONE)){
-			if(actual.isAnyEventAvaiable()){
+			if(!isActualRoot() && actual.isAnyEventAvaiable()){
 				String activity = executeEvents();
 				if(activity.equals(actual.getActivity())){
 					actual.setState(NodeState.VISITED);
@@ -214,7 +219,7 @@ public class TestCase extends UiAutomatorTestCase {
 						getUiDevice().pressBack();
 					}
 				}
-			}else{
+			}else if(!isActualRoot()){
 				actual.setState(NodeState.PASS);
 				if(!actual.getDad().getActivity().equals(actual.getActivity())){
 					getUiDevice().pressBack();
@@ -222,7 +227,7 @@ public class TestCase extends UiAutomatorTestCase {
 			}
 			
 		}else if(actual.getState().equals(NodeState.VISITED)){
-			if(actual.isAnyEventAvaiable()){
+			if(actual.isAnyEventAvaiable() && !isActualRoot()){
 				String activity = executeEvents();
 				if(!activity.equals(actual.getActivity())){
 					getActualViewElements();
@@ -240,9 +245,14 @@ public class TestCase extends UiAutomatorTestCase {
 						return;
 					}
 				}
-				actual.setState(NodeState.PASS);
-				if(!actual.getDad().getActivity().equals(actual.getActivity())){
-					getUiDevice().pressBack();
+				if(!isActualRoot() ){
+					actual.setState(NodeState.PASS);
+					if(!actual.getDad().getActivity().equals(actual.getActivity())){
+						getUiDevice().pressBack();
+					}
+				}else{
+					actual.setState(NodeState.PASS);
+					return;
 				}
 			}
 		}
