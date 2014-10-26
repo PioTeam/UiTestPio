@@ -53,11 +53,11 @@ public class TestCase extends UiAutomatorTestCase {
 
 		UiSelector selector = new UiSelector().scrollable(true);
 		UiScrollable appViews = new UiScrollable(selector);
-		UiObject settingsApp = appViews.getChildByText(new UiSelector()
+		UiObject app = appViews.getChildByText(new UiSelector()
 				.className(android.widget.TextView.class.getName()), appName);
-		settingsApp.clickAndWaitForNewWindow();
+		app.clickAndWaitForNewWindow();
 		
-		Node actual = new Node(null, "", getUiDevice().getCurrentActivityName());
+		Node actual = new Node(null, "", getUiDevice().getCurrentActivityName(), app);
 		tree = new Tree(actual);
 
 		UiDevice device = getUiDevice();
@@ -150,7 +150,7 @@ public class TestCase extends UiAutomatorTestCase {
 		for (int i = 0; i < numeroItemsVisuales; i++) {
 			UiSelector selector1 = new UiSelector().index(i);
 			UiObject obj = listview_elements.getChild(selector1);
-			aux = agregarNodo(actual, i+"", getUiDevice().getCurrentActivityName());
+			aux = agregarNodo(actual, i+"", getUiDevice().getCurrentActivityName(), obj);
 			System.out.println("-------------------Texto lista elemento " + i
 					+ ":  " + obj.toString());
 //			System.out.println("----------------------------objeto " + i
@@ -176,8 +176,8 @@ public class TestCase extends UiAutomatorTestCase {
 		// fin obtener lista
 	}
 	
-	public Node agregarNodo(Node dad, String index, String activity){
-		Node node = new Node(dad, index, activity);
+	public Node agregarNodo(Node dad, String index, String activity, UiObject object){
+		Node node = new Node(dad, index, activity, object);
 		actual.add(node);
 		return node;
 	}

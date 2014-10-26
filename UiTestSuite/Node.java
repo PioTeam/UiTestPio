@@ -2,6 +2,8 @@ package UiTest.UiTestSuite;
 
 import java.util.ArrayList;
 
+import com.android.uiautomator.core.UiObject;
+
 
 public class Node {
 	private String activity;
@@ -9,12 +11,14 @@ public class Node {
 	private Node dad;
 	private ArrayList<Node> childs;
 	private NodeState state;
+	private UiObject object;
 	
-	public Node(Node dad, String index, String activity){
+	public Node(Node dad, String index, String activity, UiObject object){
 		this.dad = dad;
 		this.id = dad.getId()+"."+index;
 		this.activity = activity;
 		this.state = NodeState.NONE;
+		this.object = object;
 	}
 	
 	public void add(Node node){
@@ -53,5 +57,13 @@ public class Node {
 
 	public void setState(NodeState state) {
 		this.state = state;
+	}
+	
+	public UiObject getObject(){
+		return object;
+	}
+	
+	public void setObject(UiObject object){
+		this.object = object;
 	}
 }
