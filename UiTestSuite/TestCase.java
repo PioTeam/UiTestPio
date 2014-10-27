@@ -16,15 +16,9 @@ import android.util.Log;
 import com.android.uiautomator.core.*;
 import com.android.uiautomator.testrunner.*;
 
-/**
-  asd
-
-NOTE:1.This class can contain only one test case.
-	 2.Do not change the class name.
-*/
 public class TestCase extends UiAutomatorTestCase {   
 
-	private static String TAG = "asd";
+	private static String TAG = "TestCase";
 	
 	private String propertiesPath = "/UiTest/properties.txt";
 	private String[] args = new String[2];
@@ -141,50 +135,61 @@ public class TestCase extends UiAutomatorTestCase {
 		return app;
 	}
 
-	public void getActualViewElements() throws UiObjectNotFoundException {
+	public void getActualViewElements()  {
 
 		// inicio obtener lista
-		UiObject listview_elements = new UiObject(
-				new UiSelector().className("android.widget.ListView"));
-
-		int numeroItemsVisuales = listview_elements.getChildCount();
-		System.out.println("-----------N° elementos lista " + numeroItemsVisuales);
-		Node aux;
-		for (int i = 0; i < numeroItemsVisuales; i++) {
-			UiSelector selector1 = new UiSelector().index(i);
-			UiObject obj = listview_elements.getChild(selector1);
-			aux = addNode(actual, i+"", getUiDevice().getCurrentActivityName(), obj);
-			System.out.println("-------------------Texto lista elemento " + i
-					+ ":  " + obj.toString());
-			System.out.println("----------------------------childCount " + i
-					+ ":  " + obj.getChildCount());
-			System.out.println("----------------------------descrip " + i
-					+ ":  " + obj.getContentDescription());
-			System.out.println("----------------------------texto " + i + ":  "
-					+ obj.getText());
-			System.out.println("----------------------------checkable " + i
-					+ ":  " + obj.isCheckable());
-			System.out.println("----------------------------clickable " + i
-					+ ":  " + obj.isClickable());
-			System.out.println("----------------------------focusable " + i
-					+ ":  " + obj.isFocusable());
-			System.out.println("----------------------------scrollable " + i
-					+ ":  " + obj.isScrollable());
-			System.out.println("----------------------------bounds " + i
-					+ ":  " + obj.getBounds());
+		UiObject listview_elements;
+		try {
+			listview_elements = new UiObject(
+					new UiSelector().className("android.widget.ListView"));
+		} catch (Exception e) {
+			listview_elements = new UiObject(
+					new UiSelector().className("android.widget.LinearLayout"));
+		}
+		try {
+			int numeroItemsVisuales = listview_elements.getChildCount();
+			System.out.println("-----------N° elementos lista " + numeroItemsVisuales);
+			for (int i = 0; i < numeroItemsVisuales; i++) {
+				UiSelector selector1 = new UiSelector().index(i);
+				UiObject obj = listview_elements.getChild(selector1);
+				addNode(actual, i+"", getUiDevice().getCurrentActivityName(), obj);
+				System.out.println("-------------------Texto lista elemento " + i
+						+ ":  " + obj.toString());
+				System.out.println("----------------------------childCount " + i
+						+ ":  " + obj.getChildCount());
+				System.out.println("----------------------------descrip " + i
+						+ ":  " + obj.getContentDescription());
+				System.out.println("----------------------------texto " + i + ":  "
+						+ obj.getText());
+				System.out.println("----------------------------checkable " + i
+						+ ":  " + obj.isCheckable());
+				System.out.println("----------------------------clickable " + i
+						+ ":  " + obj.isClickable());
+				System.out.println("----------------------------focusable " + i
+						+ ":  " + obj.isFocusable());
+				System.out.println("----------------------------scrollable " + i
+						+ ":  " + obj.isScrollable());
+				System.out.println("----------------------------bounds " + i
+						+ ":  " + obj.getBounds());
+			}
+			System.out.println(actual.getChilds());
+		// TODO: handle exception
+		}catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
 		}
 	}
 	
 	public String executeEvents() throws UiObjectNotFoundException{
-		if(!actual.isCheckable() && actual.getObject().isCheckable()){
+		if(actual.isCheckable() ){
 			actual.getObject().click();
-			actual.setCheckable(true);
-		}else if(!actual.isClickable() && actual.getObject().isClickable()){
+			actual.setCheckable(false);
+		}else if(actual.isClickable() ){
 			actual.getObject().click();
-			actual.setClickable(true);
-		}else if(!actual.isLongClickable() && actual.getObject().isLongClickable()){
+			actual.setClickable(false);
+		}else if(actual.isLongClickable() ){
 			actual.getObject().longClick();
-			actual.setLongClickable(true);
+			actual.setLongClickable(false);
 		}
 		System.out.println("------------ execute event call! "+ getUiDevice().getCurrentActivityName());
 		return getUiDevice().getCurrentActivityName();
@@ -201,6 +206,7 @@ public class TestCase extends UiAutomatorTestCase {
 	}
     
 	public void evaluateState() throws UiObjectNotFoundException{
+		System.out.println("------------ evaluate Node "+ actual.getId()+" state " +actual.getState());
 		if(actual.getState().equals(NodeState.PASS)){
 			actual = actual.getDad();
 		}else if(actual.getState().equals(NodeState.ERROR)){
@@ -222,6 +228,13 @@ public class TestCase extends UiAutomatorTestCase {
 			}else if(!isActualRoot()){
 				actual.setState(NodeState.PASS);
 				if(!actual.getDad().getActivity().equals(actual.getActivity())){
+					getUiDevice().pressBack();
+				}
+			}else{
+				actual.setState(NodeState.VISITED);
+				if(actual.getChilds() != null){
+					actual = actual.getChilds().get(0);						
+				}else{
 					getUiDevice().pressBack();
 				}
 			}
@@ -298,10 +311,14 @@ class Node {
 		this.activity = activity;
 		this.state = NodeState.NONE;
 		this.object = object;
-		this.clickable = false;
-		this.scrollable = false;
-		this.checkable = false;
-		this.longClickable = false;
+		try {
+			this.clickable = object.isClickable();
+			this.scrollable = object.isScrollable();
+			this.checkable = object.isCheckable();
+			this.longClickable = object.isLongClickable();
+		} catch (UiObjectNotFoundException e) {
+			e.printStackTrace();
+		}
 	}	
 	public void add(Node node){
 		if(childs==null)childs = new ArrayList<Node>();
