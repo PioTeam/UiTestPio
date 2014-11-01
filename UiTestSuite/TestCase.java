@@ -21,9 +21,10 @@ public class TestCase extends UiAutomatorTestCase {
 	private static String TAG = "TestCase";
 	
 	private String propertiesPath = "/UiTest/properties.txt";
+	private String treePath = "/UiTest/tree.txt";
 	private String[] args = new String[2];
 	private String appName, packageName = "";
-	private String contentDefaultFile = "appName = Settings\ntabApp = 2";
+	private String contentDefaultFile = "appName = Settings\npackageName = com.android.settings";
 	private Tree tree;
 	private Node actual;
 
@@ -40,7 +41,7 @@ public class TestCase extends UiAutomatorTestCase {
 		System.out.println("------------- Tree :D "+tree);
 		// Validate that the package name is the expected one
 		// UiObject settingsValidation = new UiObject(
-		// new UiSelector().packageName("com.android.settings"));
+		// new UiSelector().packageName(packageName));
 
 		// assertTrue("Unable to detect Settings", settingsValidation.exists());
 		// // CODE:END
@@ -113,6 +114,44 @@ public class TestCase extends UiAutomatorTestCase {
 		return text.toString();
 	}
 	
+	public void writeTree() {
+		// Find the directory for the SD Card using the API
+		// *Don't* hardcode "/sdcard"
+		File sdcard = Environment.getExternalStorageDirectory();
+
+		// Get the text file
+		File file = new File(sdcard, treePath);
+		if (!file.exists()) {			
+			System.out.println("No such file exists, creating now");
+			try {
+				if (file.createNewFile()) {	
+					FileWriter fw = new FileWriter(file.getAbsoluteFile());
+					BufferedWriter bw = new BufferedWriter(fw);
+					bw.write(tree.toString());
+					bw.close();
+					System.out.printf(
+							"Successfully created new file: %s%n", file);
+				} else {
+					System.out.printf("Failed to create new file: %s%n", file);
+				}
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}			
+		}else{
+			FileWriter fw;
+			try {
+				fw = new FileWriter(file.getAbsoluteFile());
+				BufferedWriter bw = new BufferedWriter(fw);
+				bw.write(tree.toString());
+				bw.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public UiObject openApp() throws UiObjectNotFoundException{
 		// takeScreenShot();
 		getUiDevice().pressHome();
@@ -146,33 +185,19 @@ public class TestCase extends UiAutomatorTestCase {
 		}
 		return element;
 	}
-	public void findElements(UiObject listview_elements)  {
+	
+	public void findElements(UiObject viewObject)  {
 		
 		try {
-			int numeroItemsVisuales = listview_elements.getChildCount();
+			int numeroItemsVisuales = viewObject.getChildCount();
 			System.out.println("-----------N° elementos lista " + numeroItemsVisuales);
 			for (int i = 0; i < numeroItemsVisuales; i++) {
 				UiSelector selector1 = new UiSelector().index(i);
-				UiObject obj = listview_elements.getChild(selector1);
-				addNode(actual, i+"", getUiDevice().getCurrentActivityName(), obj);
-				System.out.println("-------------------Texto lista elemento " + i
-						+ ":  " + obj.toString());
-				System.out.println("----------------------------childCount " + i
-						+ ":  " + obj.getChildCount());
-				System.out.println("----------------------------descrip " + i
-						+ ":  " + obj.getContentDescription());
-				System.out.println("----------------------------texto " + i + ":  "
-						+ obj.getText());
-				System.out.println("----------------------------checkable " + i
-						+ ":  " + obj.isCheckable());
-				System.out.println("----------------------------clickable " + i
-						+ ":  " + obj.isClickable());
-				System.out.println("----------------------------focusable " + i
-						+ ":  " + obj.isFocusable());
-				System.out.println("----------------------------scrollable " + i
-						+ ":  " + obj.isScrollable());
-				System.out.println("----------------------------bounds " + i
-						+ ":  " + obj.getBounds());
+				UiObject obj = viewObject.getChild(selector1);
+				if(isAnyEventAvaiable( obj)){
+					addNode(actual, i+"", getUiDevice().getCurrentActivityName(), obj);
+				}
+				findElements(obj);	
 			}
 			System.out.println(actual.getChilds());
 		// TODO: handle exception
@@ -180,6 +205,10 @@ public class TestCase extends UiAutomatorTestCase {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
+	}
+	
+	public boolean isAnyEventAvaiable(UiObject object) throws UiObjectNotFoundException{
+		return object.isScrollable() || 	object.isCheckable() || object.isLongClickable()|| object.isClickable();
 	}
 	
 	public String executeEvents() throws UiObjectNotFoundException{
@@ -288,7 +317,10 @@ class Tree {
 	public void setRoot(Node root) {
 		this.root = root;
 	}
-	
+	public String toString(){
+		System.out.println(root.toString());
+		return "";
+	}
 }
 
 class Node {
@@ -387,6 +419,19 @@ class Node {
 	}
 	public boolean isAnyEventAvaiable(){
 		return clickable || scrollable || checkable || longClickable;
+	}
+	public String toString(){
+		String text="";
+		try {
+			text += "id: "+id+" "+object.getClassName()+"\n";
+			for(Node n: childs){
+				text += "\t"+n.toString();
+			}
+		} catch (UiObjectNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return text;
 	}
 }
 
