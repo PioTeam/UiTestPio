@@ -22,7 +22,7 @@ public class TestCase extends UiAutomatorTestCase {
 	
 	private String propertiesPath = "/UiTest/properties.txt";
 	private String[] args = new String[2];
-	private String appName, tabApp = "";
+	private String appName, packageName = "";
 	private String contentDefaultFile = "appName = Settings\ntabApp = 2";
 	private Tree tree;
 	private Node actual;
@@ -30,11 +30,12 @@ public class TestCase extends UiAutomatorTestCase {
 	public void test() throws UiObjectNotFoundException {
 		readProperties();
 		appName = args[0];
-		tabApp = args[1]; 
+		packageName = args[1]; 
 		UiObject app = openApp();		
 		actual = new Node(null, "", getUiDevice().getCurrentActivityName(), app);
 		tree = new Tree(actual);
-		getActualViewElements();
+		UiObject element = getGeneralElement();		
+		findElements(element);
 		evaluateState();
 		System.out.println("------------- Tree :D "+tree);
 		// Validate that the package name is the expected one
@@ -134,18 +135,19 @@ public class TestCase extends UiAutomatorTestCase {
 		
 		return app;
 	}
-
-	public void getActualViewElements()  {
-
-		// inicio obtener lista
-		UiObject listview_elements;
+	public UiObject getGeneralElement(){
+		UiObject element;
 		try {
-			listview_elements = new UiObject(
-					new UiSelector().className("android.widget.ListView"));
+			element = new UiObject(
+					new UiSelector().className("android.widget.FrameLayout"));
 		} catch (Exception e) {
-			listview_elements = new UiObject(
+			element = new UiObject(
 					new UiSelector().className("android.widget.LinearLayout"));
 		}
+		return element;
+	}
+	public void findElements(UiObject listview_elements)  {
+		
 		try {
 			int numeroItemsVisuales = listview_elements.getChildCount();
 			System.out.println("-----------N° elementos lista " + numeroItemsVisuales);
@@ -217,7 +219,7 @@ public class TestCase extends UiAutomatorTestCase {
 				if(activity.equals(actual.getActivity())){
 					actual.setState(NodeState.VISITED);
 				}else{
-					getActualViewElements();
+					findElements(getGeneralElement());
 					actual.setState(NodeState.VISITED);
 					if(actual.getChilds() != null){
 						actual = actual.getChilds().get(0);						
@@ -233,7 +235,7 @@ public class TestCase extends UiAutomatorTestCase {
 			}else{
 				actual.setState(NodeState.VISITED);
 				if(actual.getChilds() != null){
-					actual = actual.getChilds().get(0);						
+					actual = actual.getChilds().get(2);						
 				}else{
 					getUiDevice().pressBack();
 				}
@@ -243,7 +245,7 @@ public class TestCase extends UiAutomatorTestCase {
 			if(actual.isAnyEventAvaiable() && !isActualRoot()){
 				String activity = executeEvents();
 				if(!activity.equals(actual.getActivity())){
-					getActualViewElements();
+					findElements(getGeneralElement());
 					if(actual.getChilds() != null){
 						actual = actual.getChilds().get(0);						
 					}else{
