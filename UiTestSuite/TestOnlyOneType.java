@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
 import java.util.ArrayList;
 
 import android.os.Build;
@@ -14,19 +13,26 @@ import android.os.Environment;
 import android.util.Log;
 import com.android.uiautomator.core.*;
 import com.android.uiautomator.testrunner.*;
+import static UiTest.BBAT_Utility.BBATUtility.*;
 
-public class TestCase extends UiAutomatorTestCase {
+/**
+  This test only get one type of element view
 
-	private static String TAG = "TestCase";
+NOTE:1.This class can contain only one test case.
+	 2.Do not change the class name.
+*/
+public class TestOnlyOneType extends UiAutomatorTestCase {   
+
+	private static String TAG = "TestOnlyOneType";
 
 	private String propertiesPath = "/UiTest/properties.txt";
-	private String TreePath = "/UiTest/Tree.txt";
+	private String TreesPath = "/UiTest/Trees.txt";
 	private String errorPath = "/UiTest/error.txt";
 	private String[] args = new String[2];
 	private String appName, packageName = "";
 	private String contentDefaultFile = "appName = Settings\npackageName = com.android.settings";
-	private Tree Tree;
-	private Node actual;
+	private Trees Trees;
+	private NodeTrees actual;
 	private String keyStringActivity = "";
 
 	public void test() {
@@ -35,13 +41,13 @@ public class TestCase extends UiAutomatorTestCase {
 			appName = args[0];
 			packageName = args[1];
 			UiObject app = openApp();
-			actual = new Node(null, "", getActualActivity(), app);
-			Tree = new Tree(actual);
+			actual = new NodeTrees(null, "", getActualActivity(), app);
+			Trees = new Trees(actual);
 			UiObject element = getGeneralElement();
 			findObjectsFromContainer(element);
 			evaluateState();
-			writeTree();
-			// System.out.println("------------- Tree :D "+Tree);
+			writeTrees();
+			// System.out.println("------------- Trees :D "+Trees);
 			// Validate that the package name is the expected one
 			// UiObject settingsValidation = new UiObject(
 			// new UiSelector().packageName(packageName));
@@ -82,12 +88,12 @@ public class TestCase extends UiAutomatorTestCase {
 		return getActualActivity();
 	}
 
-	public Node addNode(UiObject object) throws UiObjectNotFoundException {
+	public NodeTrees addNodeTrees(UiObject object) throws UiObjectNotFoundException {
 		if (object!=null && isAnyEventAvaiable(object)) {
-			Node Node = new Node(actual, object.getChildCount() + "",
+			NodeTrees NodeTrees = new NodeTrees(actual, object.getChildCount() + "",
 					getActualActivity(), object);
-			actual.add(Node);
-			return Node;
+			actual.add(NodeTrees);
+			return NodeTrees;
 		}
 		return null;
 	}
@@ -109,15 +115,14 @@ public class TestCase extends UiAutomatorTestCase {
 		}
 		return element;
 	}
-	
+
 	public void findFrameLayout(UiObject container)
 			throws UiObjectNotFoundException {
 		UiObject frameLayout = container.getChild(new UiSelector()
 				.className(android.widget.FrameLayout.class.getName()));
 		if (frameLayout.exists()) {
 			System.out.println("---frameLayout");
-			findObjectsFromContainer(frameLayout);
-			addNode(frameLayout);
+			addNodeTrees(frameLayout);
 		}
 	}
 
@@ -127,8 +132,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.LinearLayout.class.getName()));
 		if (linearLayout.exists()) {
 			System.out.println("---linearLayout");
-			findObjectsFromContainer(linearLayout);
-			addNode(linearLayout);
+			addNodeTrees(linearLayout);
 		}
 	}
 
@@ -138,18 +142,15 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.RelativeLayout.class.getName()));
 		if (relativeLayout.exists()) {
 			System.out.println("---relativeLayout");
-			findObjectsFromContainer(relativeLayout);
-			addNode(relativeLayout);
+			addNodeTrees(relativeLayout);
 		}
 	}
-
 	public void findView(UiObject container) throws UiObjectNotFoundException {
 		UiObject view = container.getChild(new UiSelector()
 				.className(android.view.View.class.getName()));
 		if (view.exists()) {
 			System.out.println("---view");
-			findObjectsFromContainer(view);
-			addNode(view);
+			addNodeTrees(view);
 		}
 	}
 
@@ -159,8 +160,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.GridView.class.getName()));
 		if (gridView.exists()) {
 			System.out.println("---gridView");
-			findObjectsFromContainer(gridView);
-			addNode(gridView);
+			addNodeTrees(gridView);
 		}
 	}
 
@@ -170,8 +170,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.ListView.class.getName()));
 		if (listView.exists()) {
 			System.out.println("---listView");
-			findObjectsFromContainer(listView);
-			addNode(listView);
+			addNodeTrees(listView);
 		}
 	}
 
@@ -180,8 +179,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.Switch.class.getName()));
 		if (switchObject.exists()) {
 			System.out.println("---switchObject");
-			findObjectsFromContainer(switchObject);
-			addNode(switchObject);
+			addNodeTrees(switchObject);
 		}
 	}
 
@@ -190,8 +188,17 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.Button.class.getName()));
 		if (button.exists()) {
 			System.out.println("---button");
-			findObjectsFromContainer(button);
-			addNode(button);
+			addNodeTrees(button);
+		}
+	}
+
+	
+	public void findImageButton(UiObject container) throws UiObjectNotFoundException {
+		UiObject imageButton = container.getChild(new UiSelector()
+				.className(android.widget.ImageButton.class.getName()));
+		if (imageButton.exists()) {
+			System.out.println("---imageButton");
+			addNodeTrees(imageButton);
 		}
 	}
 
@@ -201,8 +208,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.DatePicker.class.getName()));
 		if (datePicker.exists()) {
 			System.out.println("---datePicker");
-			findObjectsFromContainer(datePicker);
-			addNode(datePicker);
+			addNodeTrees(datePicker);
 		}
 	}
 
@@ -212,8 +218,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.CheckBox.class.getName()));
 		if (checkBox.exists()) {
 			System.out.println("---CheckBox");
-			findObjectsFromContainer(checkBox);
-			addNode(checkBox);
+			addNodeTrees(checkBox);
 		}
 	}
 
@@ -223,8 +228,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.EditText.class.getName()));
 		if (editText.exists()) {
 			System.out.println("---Frame");
-			findObjectsFromContainer(editText);
-			addNode(editText);
+			addNodeTrees(editText);
 		}
 	}
 
@@ -234,8 +238,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.RadioButton.class.getName()));
 		if (radioButton.exists()) {
 			System.out.println("---radioButton");
-			findObjectsFromContainer(radioButton);
-			addNode(radioButton);
+			addNodeTrees(radioButton);
 		}
 	}
 
@@ -245,8 +248,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.RadioGroup.class.getName()));
 		if (radioGroup.exists()) {
 			System.out.println("---radioGroup");
-			findObjectsFromContainer(radioGroup);
-			addNode(radioGroup);
+			addNodeTrees(radioGroup);
 		}
 	}
 
@@ -256,8 +258,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.ToggleButton.class.getName()));
 		if (toggleButton.exists()) {
 			System.out.println("---toggleButton");
-			findObjectsFromContainer(toggleButton);
-			addNode(toggleButton);
+			addNodeTrees(toggleButton);
 		}
 	}
 
@@ -267,8 +268,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.Spinner.class.getName()));
 		if (spinner.exists()) {
 			System.out.println("---spinner");
-			findObjectsFromContainer(spinner);
-			addNode(spinner);
+			addNodeTrees(spinner);
 		}
 	}
 
@@ -278,8 +278,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.TimePicker.class.getName()));
 		if (timePicker.exists()) {
 			System.out.println("---timePicker");
-			findObjectsFromContainer(timePicker);
-			addNode(timePicker);
+			addNodeTrees(timePicker);
 		}
 	}
 
@@ -289,8 +288,7 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.ImageView.class.getName()));
 		if (imageView.exists()) {
 			System.out.println("---imageView");
-			findObjectsFromContainer(imageView);
-			addNode(imageView);
+			addNodeTrees(imageView);
 		}
 	}
 
@@ -300,14 +298,13 @@ public class TestCase extends UiAutomatorTestCase {
 				.className(android.widget.TextView.class.getName()));
 		if (textView.exists()) {
 			System.out.println("---textView");
-			findObjectsFromContainer(textView);
-			addNode(textView);
+			addNodeTrees(textView);
 		}
 	}
 
 	public void findObjectsFromContainer(UiObject container)
 			throws UiObjectNotFoundException {
-		System.out.println("-Buscando todos");
+		System.out.println("-Buscando todos en "+ getActualActivity());
 		try {
 			findFrameLayout(container);
 		} catch (Exception e) {
@@ -340,6 +337,11 @@ public class TestCase extends UiAutomatorTestCase {
 		}
 		try {
 			findButton(container);
+		} catch (Exception e) {
+			System.out.println("-Error findButton");
+		}
+		try{
+			findImageButton(container);
 		} catch (Exception e) {
 			System.out.println("-Error findButton");
 		}
@@ -396,24 +398,24 @@ public class TestCase extends UiAutomatorTestCase {
 	}
 
 	public void evaluateState() throws UiObjectNotFoundException {
-		System.out.println("------------ evaluate Node " + actual.getId()
+		System.out.println("------------ evaluate NodeTrees " + actual.getId()
 				+ " state " + actual.getState());
-		if (actual.getState().equals(NodeState.PASS)) {
+		if (actual.getState().equals(NodeTreesState.PASS)) {
 			actual = actual.getDad();
 			if(actual==null){
 				getUiDevice().pressBack();
 				return;
 			}
-		} else if (actual.getState().equals(NodeState.ERROR)) {
+		} else if (actual.getState().equals(NodeTreesState.ERROR)) {
 			actual = actual.getDad();
-		} else if (actual.getState().equals(NodeState.NONE)) {
+		} else if (actual.getState().equals(NodeTreesState.NONE)) {
 			if (!isActualRoot() && actual.isAnyEventAvaiable()) {
 				String activity = executeEvents();
 				if (activity.equals(actual.getActivity())) {
-					actual.setState(NodeState.VISITED);
+					actual.setState(NodeTreesState.VISITED);
 				} else {
 					findObjectsFromContainer(getGeneralElement());
-					actual.setState(NodeState.VISITED);
+					actual.setState(NodeTreesState.VISITED);
 					if (actual.getChilds() != null) {
 						actual = actual.getChilds().get(0);
 					} else {
@@ -421,12 +423,12 @@ public class TestCase extends UiAutomatorTestCase {
 					}
 				}
 			} else if (!isActualRoot()) {
-				actual.setState(NodeState.PASS);
+				actual.setState(NodeTreesState.PASS);
 				if (!actual.getDad().getActivity().equals(actual.getActivity())) {
 					getUiDevice().pressBack();
 				}
 			} else {
-				actual.setState(NodeState.VISITED);
+				actual.setState(NodeTreesState.VISITED);
 				if (actual.getChilds() != null) {
 					actual = actual.getChilds().get(0);
 				} else {
@@ -434,7 +436,7 @@ public class TestCase extends UiAutomatorTestCase {
 				}
 			}
 
-		} else if (actual.getState().equals(NodeState.VISITED)) {
+		} else if (actual.getState().equals(NodeTreesState.VISITED)) {
 			if (actual.isAnyEventAvaiable() && !isActualRoot()) {
 				String activity = executeEvents();
 				if (!activity.equals(actual.getActivity())) {
@@ -447,9 +449,9 @@ public class TestCase extends UiAutomatorTestCase {
 				}
 			} else {
 				if(actual.getChilds()!=null){
-					for (Node n : actual.getChilds()) {
-						if (n.getState().equals(NodeState.NONE)
-								|| n.getState().equals(NodeState.VISITED)) {
+					for (NodeTrees n : actual.getChilds()) {
+						if (n.getState().equals(NodeTreesState.NONE)
+								|| n.getState().equals(NodeTreesState.VISITED)) {
 							actual = n;
 							evaluateState();
 							return;
@@ -457,7 +459,7 @@ public class TestCase extends UiAutomatorTestCase {
 					}
 				}
 				if (!isActualRoot()) {
-					actual.setState(NodeState.PASS);
+					actual.setState(NodeTreesState.PASS);
 					if (!actual.getDad().getActivity()
 							.equals(actual.getActivity())) {
 						getUiDevice().pressBack();
@@ -466,7 +468,7 @@ public class TestCase extends UiAutomatorTestCase {
 					System.out.println("1");
 					if(actual!=null){
 						System.out.println("2");
-						actual.setState(NodeState.PASS);
+						actual.setState(NodeTreesState.PASS);
 					}else{
 						System.out.println("3");
 						getUiDevice().pressBack();
@@ -545,20 +547,20 @@ public class TestCase extends UiAutomatorTestCase {
 		return text.toString();
 	}
 
-	public void writeTree() {
+	public void writeTrees() {
 		// Find the directory for the SD Card using the API
 		// *Don't* hardcode "/sdcard"
 		File sdcard = Environment.getExternalStorageDirectory();
 
 		// Get the text file
-		File file = new File(sdcard, TreePath);
+		File file = new File(sdcard, TreesPath);
 		if (!file.exists()) {
 			System.out.println("No such file exists, creating now");
 			try {
 				if (file.createNewFile()) {
 					FileWriter fw = new FileWriter(file.getAbsoluteFile());
 					BufferedWriter bw = new BufferedWriter(fw);
-					bw.write(Tree.toString());
+					bw.write(Trees.toString());
 					bw.close();
 					System.out.printf("Successfully created new file: %s%n",
 							file);
@@ -573,7 +575,7 @@ public class TestCase extends UiAutomatorTestCase {
 			try {
 				fw = new FileWriter(file.getAbsoluteFile());
 				BufferedWriter bw = new BufferedWriter(fw);
-				bw.write(Tree.toString());
+				bw.write(Trees.toString());
 				bw.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -643,19 +645,19 @@ public class TestCase extends UiAutomatorTestCase {
 
 }
 
-class Tree {
-	private Node root;
+class Trees {
+	private NodeTrees root;
 
-	public Tree(Node Node) {
-		this.root = Node;
-		Node.setDad(null);
+	public Trees(NodeTrees NodeTrees) {
+		this.root = NodeTrees;
+		NodeTrees.setDad(null);
 	}
 
-	public Node getRoot() {
+	public NodeTrees getRoot() {
 		return root;
 	}
 
-	public void setRoot(Node root) {
+	public void setRoot(NodeTrees root) {
 		this.root = root;
 	}
 
@@ -664,19 +666,19 @@ class Tree {
 	}
 }
 
-class Node {
+class NodeTrees {
 	private String activity;
 	private String id;
-	private Node dad;
-	private ArrayList<Node> childs;
-	private NodeState state;
+	private NodeTrees dad;
+	private ArrayList<NodeTrees> childs;
+	private NodeTreesState state;
 	private UiObject object;
 	private boolean clickable;
 	private boolean scrollable;
 	private boolean checkable;
 	private boolean longClickable;
 
-	public Node(Node dad, String index, String activity, UiObject object) {
+	public NodeTrees(NodeTrees dad, String index, String activity, UiObject object) {
 		this.dad = dad;
 		if (dad == null) {
 			this.id = "0";
@@ -684,7 +686,7 @@ class Node {
 			this.id = dad.getId() + "." + index;
 		}
 		this.activity = activity;
-		this.state = NodeState.NONE;
+		this.state = NodeTreesState.NONE;
 		this.object = object;
 		try {
 			this.clickable = object.isClickable();
@@ -696,10 +698,10 @@ class Node {
 		}
 	}
 
-	public void add(Node Node) {
+	public void add(NodeTrees NodeTrees) {
 		if (childs == null)
-			childs = new ArrayList<Node>();
-		childs.add(Node);
+			childs = new ArrayList<NodeTrees>();
+		childs.add(NodeTrees);
 	}
 
 	public String getActivity() {
@@ -718,27 +720,27 @@ class Node {
 		this.id = id;
 	}
 
-	public Node getDad() {
+	public NodeTrees getDad() {
 		return dad;
 	}
 
-	public void setDad(Node dad) {
+	public void setDad(NodeTrees dad) {
 		this.dad = dad;
 	}
 
-	public ArrayList<Node> getChilds() {
+	public ArrayList<NodeTrees> getChilds() {
 		return childs;
 	}
 
-	public void setChilds(ArrayList<Node> childs) {
+	public void setChilds(ArrayList<NodeTrees> childs) {
 		this.childs = childs;
 	}
 
-	public NodeState getState() {
+	public NodeTreesState getState() {
 		return state;
 	}
 
-	public void setState(NodeState state) {
+	public void setState(NodeTreesState state) {
 		this.state = state;
 	}
 
@@ -789,13 +791,13 @@ class Node {
 	public String toString() {
 		String text = "";
 		text += "id: " + id + " \n";
-		for (Node n : childs) {
+		for (NodeTrees n : childs) {
 			text += "\t" + n.toString();
 		}
 		return text;
 	}
 }
 
-enum NodeState {
+enum NodeTreesState {
 	ERROR, PASS, VISITED, NONE
 }
